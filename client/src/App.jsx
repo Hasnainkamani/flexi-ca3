@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowDownLeft, ArrowUpRight, Wallet, Plus, Trash2, TrendingUp, CircleDollarSign, LoaderCircle } from 'lucide-react';
 
+const API_ROOT = (import.meta.env.VITE_API_URL || '').replace(/\\/$/, '');
+const api = path => `${API_ROOT}${path}`;
+
 const money = n => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(n || 0);
 const dateLabel = d => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
@@ -16,7 +19,7 @@ export default function App() {
   async function refresh() {
     setLoading(true); setError('');
     try {
-      const [t, s] = await Promise.all([fetch('/api/transactions'), fetch('/api/transactions/summary')]);
+      const [t, s] = await Promise.all([fetch(api('/api/transactions')), fetch(api('/api/transactions/summary'))]);
       if (!t.ok || !s.ok) throw new Error('Could not load data. Is the API running?');
       setTransactions(await t.json()); setSummary(await s.json());
     } catch (e) { setError(e.message || 'Unable to connect to API.'); }
@@ -30,7 +33,7 @@ export default function App() {
   async function addTransaction(e) {
     e.preventDefault(); setSaving(true); setError('');
     try {
-      const res = await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      const res = await fetch(api('/api/transactions'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Could not save transaction.');
       setForm({ ...form, title: '', amount: '', note: '' });
@@ -42,7 +45,7 @@ export default function App() {
   async function removeTransaction(id) {
     if (!confirm('Delete this transaction?')) return;
     try {
-      const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
+      const res = await fetch(api(`/api/transactions/${id}`), { method: 'DELETE' });
       if (!res.ok) throw new Error('Could not delete transaction.');
       await refresh();
     } catch (e) { setError(e.message); }

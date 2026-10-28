@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowDownLeft, ArrowUpRight, Wallet, Plus, Trash2, TrendingUp, CircleDollarSign, LoaderCircle } from 'lucide-react';
 
-const API_ROOT = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const API_ROOT = (import.meta.env.VITE_API_URL || 'https://flexi-ca3-xo7a.onrender.com').replace(/\/$/, '');
 const api = path => `${API_ROOT}${path}`;
 
 const money = n => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(n || 0);
